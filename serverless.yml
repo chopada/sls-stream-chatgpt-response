@@ -1,0 +1,25 @@
+service: sls-stream-chatgpt-response
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage}
+  region: ap-south-1
+  environment: ${file(env.yml):${self:provider.stage}}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - logs:TagResource
+          Resource: '*'
+
+functions:
+  chatCompletions:
+    handler: index.handler
+    url:
+      invokeMode: RESPONSE_STREAM
